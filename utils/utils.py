@@ -2,6 +2,8 @@ import os
 from os.path import join
 from pathlib import Path
 
+from rdkit import Chem
+
 
 def get_project_path() -> str:
     return str(Path(__file__).parent.parent)
@@ -13,3 +15,10 @@ def pjoin(*args) -> Path:
 
 def get_data_folder() -> str:
     return pjoin(get_project_path(), "data")
+
+def get_molecule(smiles: str):
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+    except Exception as e:
+        mol = None
+    return mol
