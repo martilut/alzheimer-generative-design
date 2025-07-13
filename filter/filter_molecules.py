@@ -1,17 +1,11 @@
-import requests
 import pandas as pd
-import numpy as np
 from rdkit import Chem
-from rdkit import DataStructs
-from rdkit.Chem import AllChem
-from rdkit.Chem import QED
-from rdkit.Chem import Descriptors
-from rdkit.Chem import QED, Lipinski, Descriptors
+from rdkit.Chem import QED, Descriptors, AllChem, Lipinski
 from rdkit.Chem.FilterCatalog import FilterCatalog, FilterCatalogParams
-import sascorer
+from filter.sascorer import calculateScore
 
 
-def filter(df_hits):
+def filter_molecules(df: pd.DataFrame):
     ### Рассчет параметров
 
     # Считаем QED
@@ -22,7 +16,7 @@ def filter(df_hits):
 
     # Считаем SA_SCORER
     def sa_scorer_definer(mol):
-        return sascorer.calculateScore(mol)
+        return calculateScore(mol)
 
     # Фиксируем нарушения правил Липинского
     def lipinski_definer(mol):
@@ -47,7 +41,7 @@ def filter(df_hits):
     def compute_properties(mol):
 
         if not mol:
-            return {"ToxicophoreFree": False, "BBB": False}
+            return {"tox_free": False, "bbb": False}
 
         # --- Токсикофоры ---
         params = FilterCatalogParams()
@@ -61,7 +55,7 @@ def filter(df_hits):
         logp = Descriptors.MolLogP(mol)
         bbb_pass = (400 <= mol_weight <= 500) and (logp > 1)
 
-        return {"ToxicophoreFree": toxicophore_free, "BBB": bbb_pass}
+        return {"tox_free": toxicophore_free, "bbb": bbb_pass}
 
     # Проверка на канцерогенность
     def carcinogenicity_check(mol):
@@ -82,27 +76,41 @@ def filter(df_hits):
                 return True
         return False
 
-    ### Добавляем рассчеты в датафрейм
+    # --- Apply computations ---
 
-    df_props = df_hits["RDkitMol"].apply(compute_properties).apply(pd.Series)
-    df_hits = pd.concat([df_hits, df_props], axis=1)
-    df_hits["QED"] = df_hits["SMILES"].apply(QED_definer)
-    df_hits["SA_Score"] = df_hits["RDkitMol"].apply(sa_scorer_definer)
-    df_hits["Lipinski_violations"] = df_hits["RDkitMol"].apply(lipinski_definer)
-    df_hits["CarcinogenicityFree"] = df_hits["RDkitMol"].apply(carcinogenicity_check)
+    df_filtered = []
+    for mol_idx in df.index:
+        smiles = df.loc[mol_idx, "canonical_smiles"]
+        ic50 = df.loc[mol_idx, "standard_value"]
+        res = {
+            "molecule_chembl_id": mol_idx,
+            "smiles": smiles,
+            "ic50": ic50,
+        }
+        mol = Chem.MolFromSmiles(smiles)
+        if mol is None:
+            print(f"Invalid SMILES for {mol_idx}: {smiles}")
+            continue
+        props = compute_properties(mol)
+        res.update(props)
 
-    ### Непосредственно фильтрация
-    df_hits_filtered = (
-        df_hits[
-            (df_hits["QED"] > 0.7)
-            & (df_hits["SA_Score"].between(2, 6))
-            & (df_hits["BBB"] == True)
-            & (df_hits["ToxicophoreFree"] == True)
-            & (df_hits["Lipinski_violations"] <= 1)
-            & (df_hits["CarcinogenicityFree"] == True)
-        ]
-        .drop(columns={"RDkitMol"})
-        .copy()
-    )
+        res["qed"] = QED_definer(smiles)
+        res["sa"] = sa_scorer_definer(mol)
+        res["lip"] = lipinski_definer(mol)
+        res["carc"] = not carcinogenicity_check(mol)
 
-    return df_hits_filtered
+        df_filtered.append(res)
+    df_filtered = pd.DataFrame(df_filtered)
+
+    # --- Filter conditions ---
+
+    # df_filtered = df_filtered[
+    #     (df_filtered["qed"] > 0.7) &
+    #     (df_filtered["sa"].between(2, 6)) &
+    #     (df_filtered["bbb"]) &
+    #     (df_filtered["tox_free"]) &
+    #     (df_filtered["lip"] <= 1) &
+    #     (df_filtered["carc"])
+    # ]
+
+    return df_filtered
