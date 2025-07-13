@@ -104,13 +104,13 @@ def filter_molecules(df: pd.DataFrame):
 
     # --- Filter conditions ---
 
-    # df_filtered = df_filtered[
-    #     (df_filtered["qed"] > 0.7) &
-    #     (df_filtered["sa"].between(2, 6)) &
-    #     (df_filtered["bbb"]) &
-    #     (df_filtered["tox_free"]) &
-    #     (df_filtered["lip"] <= 1) &
-    #     (df_filtered["carc"])
-    # ]
+    df_filtered = df_filtered[
+        (df_filtered["qed"] > 0.7) &
+        (df_filtered["sa"].between(2, 6)) &
+        (df_filtered["bbb"]) &
+        (df_filtered["tox_free"]) &
+        (df_filtered["lip"] <= 1) &
+        (df_filtered["carc"])
+    ]
 
     return df_filtered
