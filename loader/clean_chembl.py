@@ -117,7 +117,8 @@ def remove_constant_columns(df: pd.DataFrame) -> None:
 
 
 # parse all unique molecule ids, handle duplicate entries
-def clean_data(target_id: str, df: pd.DataFrame, rewrite: bool = False) -> pd.DataFrame:
+def clean_data(target_id: str, rewrite: bool = False) -> pd.DataFrame:
+    df = pd.read_csv(pjoin(get_data_folder(), f"{target_id}_raw.csv"))
     path = pjoin(get_data_folder(), f"{target_id}_clean.csv")
 
     # read filtered dataset file if exists
@@ -155,6 +156,5 @@ def clean_data(target_id: str, df: pd.DataFrame, rewrite: bool = False) -> pd.Da
 
 
 if __name__ == "__main__":
-    df = pd.read_csv(pjoin(get_data_folder(), "chembl_data.csv"))
-    df_cleaned = clean_data("CHEMBL230", df, rewrite=True)
+    df_cleaned = clean_data("CHEMBL230", rewrite=True)
     print(f"Filtered dataset shape: {df_cleaned.shape}")
