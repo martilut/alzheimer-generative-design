@@ -73,5 +73,5 @@ def parse_activities(target_id: str) -> pd.DataFrame:
 
 if __name__ == "__main__":
     parse_activities(
-        "CHEMBL230"
+        "CHEMBL2760"
     )  # Example target ID, replace with actual target ID as needed
