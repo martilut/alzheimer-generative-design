@@ -91,8 +91,6 @@ def handle_duplicates(df: pd.DataFrame, molecule_id: str) -> pd.DataFrame | None
 
     # soft filters
     df_unique = safe_filter(df_unique, "potential_duplicate", 0)
-    df_unique = safe_filter(df_unique, "assay_type", "B")
-    df_unique = safe_filter(df_unique, "bao_label", "single protein format")
     df_unique = safe_filter(df_unique, "standard_flag", 1)
     df_unique = safe_filter(df_unique, "standard_relation", "=")
     df_unique = safe_dropna(df_unique, ["action_type"])
