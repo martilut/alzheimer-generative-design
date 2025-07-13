@@ -10,15 +10,16 @@ from rdkit.Chem import QED, Lipinski, Descriptors
 from rdkit.Chem.FilterCatalog import FilterCatalog, FilterCatalogParams
 import sascorer
 
+
 def filter(df_hits):
-### Рассчет параметров
+    ### Рассчет параметров
 
     # Считаем QED
     def QED_definer(smiles):
         mol = Chem.MolFromSmiles(smiles)
         qed_value = QED.qed(mol)
         return qed_value
-    
+
     # Считаем SA_SCORER
     def sa_scorer_definer(mol):
         return sascorer.calculateScore(mol)
@@ -41,15 +42,12 @@ def filter(df_hits):
             violations += 1
 
         return violations
-    
-    # Ищем токсикофоры и рассчитываем BBB 
+
+    # Ищем токсикофоры и рассчитываем BBB
     def compute_properties(mol):
-        
+
         if not mol:
-            return {
-                "ToxicophoreFree": False,
-                "BBB": False
-            }
+            return {"ToxicophoreFree": False, "BBB": False}
 
         # --- Токсикофоры ---
         params = FilterCatalogParams()
@@ -63,49 +61,48 @@ def filter(df_hits):
         logp = Descriptors.MolLogP(mol)
         bbb_pass = (400 <= mol_weight <= 500) and (logp > 1)
 
-        return {
-            "ToxicophoreFree": toxicophore_free,
-            "BBB": bbb_pass
-        }
-    
+        return {"ToxicophoreFree": toxicophore_free, "BBB": bbb_pass}
+
     # Проверка на канцерогенность
     def carcinogenicity_check(mol):
         if not mol:
             return False
-        
+
         # Определяем SMARTS-паттерны канцерогенных групп
         smarts_patterns = [
-            "[NX3][C](=[O])[NX3]",     # нитрозамины
-            "c1ccc(N)cc1",            # ароматические амины
-            "[NX3]=[NX3]",            # азо-соединения
-            "[O;D2]-[N+](=O)[O-]"    # нитрогруппы
+            "[NX3][C](=[O])[NX3]",  # нитрозамины
+            "c1ccc(N)cc1",  # ароматические амины
+            "[NX3]=[NX3]",  # азо-соединения
+            "[O;D2]-[N+](=O)[O-]",  # нитрогруппы
         ]
-        
+
         for smarts in smarts_patterns:
             patt = Chem.MolFromSmarts(smarts)
             if patt and mol.HasSubstructMatch(patt):
                 return True
         return False
 
-### Добавляем рассчеты в датафрейм
+    ### Добавляем рассчеты в датафрейм
 
     df_props = df_hits["RDkitMol"].apply(compute_properties).apply(pd.Series)
     df_hits = pd.concat([df_hits, df_props], axis=1)
-    df_hits['QED'] = df_hits['SMILES'].apply(QED_definer)
+    df_hits["QED"] = df_hits["SMILES"].apply(QED_definer)
     df_hits["SA_Score"] = df_hits["RDkitMol"].apply(sa_scorer_definer)
     df_hits["Lipinski_violations"] = df_hits["RDkitMol"].apply(lipinski_definer)
     df_hits["CarcinogenicityFree"] = df_hits["RDkitMol"].apply(carcinogenicity_check)
 
-
-
-### Непосредственно фильтрация
-    df_hits_filtered = df_hits[
-        (df_hits["QED"] > 0.7) & 
-        (df_hits["SA_Score"].between(2, 6)) & 
-        (df_hits["BBB"] == True) & 
-        (df_hits["ToxicophoreFree"] == True) & 
-        (df_hits["Lipinski_violations"] <= 1) &
-        (df_hits["CarcinogenicityFree"] == True)
-    ].drop(columns={'RDkitMol'}).copy()
+    ### Непосредственно фильтрация
+    df_hits_filtered = (
+        df_hits[
+            (df_hits["QED"] > 0.7)
+            & (df_hits["SA_Score"].between(2, 6))
+            & (df_hits["BBB"] == True)
+            & (df_hits["ToxicophoreFree"] == True)
+            & (df_hits["Lipinski_violations"] <= 1)
+            & (df_hits["CarcinogenicityFree"] == True)
+        ]
+        .drop(columns={"RDkitMol"})
+        .copy()
+    )
 
     return df_hits_filtered
