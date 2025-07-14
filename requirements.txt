@@ -13,6 +13,5 @@ requests==2.32.4
 scikit-learn==1.6.1
 scipy==1.15.3
 seaborn==0.12.2
-torch==2.7.1+cu128
 tqdm==4.67.1
 xgboost==3.0.2
