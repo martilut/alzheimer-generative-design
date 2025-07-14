@@ -1,11 +1,11 @@
+import json
 import os
 from os.path import join
 from pathlib import Path
 
-from rdkit import Chem
 import matplotlib.pyplot as plt
 import seaborn as sns
-import json
+from rdkit import Chem
 
 
 def get_project_path() -> str:

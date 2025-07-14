@@ -2,7 +2,7 @@ import os
 
 import pandas as pd
 
-from utils.utils import pjoin, get_data_folder
+from utils.utils import get_data_folder, pjoin
 
 
 # initial data filtering

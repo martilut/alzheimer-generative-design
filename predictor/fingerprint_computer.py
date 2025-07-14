@@ -1,14 +1,13 @@
-import pandas as pd
-import numpy as np
-from rdkit import Chem
-from rdkit.Chem import Descriptors
-from rdkit.Chem import rdFingerprintGenerator
-from rdkit import DataStructs
-import traceback
 import os
-from mordred import Calculator, descriptors
+import traceback
 
-from utils.utils import get_project_path, get_data_folder, pjoin, get_molecule
+import numpy as np
+import pandas as pd
+from mordred import Calculator, descriptors
+from rdkit import Chem, DataStructs
+from rdkit.Chem import Descriptors, rdFingerprintGenerator
+
+from utils.utils import get_data_folder, get_molecule, get_project_path, pjoin
 
 
 def get_fp(mol, fp_generator):

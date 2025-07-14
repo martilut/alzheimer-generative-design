@@ -1,9 +1,9 @@
+import joblib
 import pandas as pd
 from rdkit import Chem
 
 from predictor.descriptor_computer import DESC_FUNCS
-from utils.utils import pjoin, get_project_path
-import joblib
+from utils.utils import get_project_path, pjoin
 
 
 def predict(smiles: str, model_name: str, desc_func_name: str) -> float:

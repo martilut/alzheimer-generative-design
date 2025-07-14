@@ -1,9 +1,9 @@
 import pandas as pd
 from rdkit import Chem
-from rdkit.Chem import QED, Descriptors, AllChem, Lipinski
+from rdkit.Chem import QED, AllChem, Descriptors, Lipinski
 from rdkit.Chem.FilterCatalog import FilterCatalog, FilterCatalogParams
-from filter.sascorer import calculateScore
 
+from filter.sascorer import calculateScore
 
 ### Рассчет параметров
 

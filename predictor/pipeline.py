@@ -1,19 +1,19 @@
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
+import os
 
-from sklearn.pipeline import Pipeline
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+from sklearn.decomposition import PCA
+from sklearn.feature_selection import SelectPercentile, f_regression
 from sklearn.model_selection import (
-    cross_val_score,
-    cross_val_predict,
     KFold,
+    cross_val_predict,
+    cross_val_score,
     cross_validate,
 )
-from sklearn.feature_selection import SelectPercentile, f_regression
+from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
-from sklearn.decomposition import PCA
-import os
 
 from utils.utils import flatten_pipeline_info, plot_predictions
 

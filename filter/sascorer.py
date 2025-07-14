@@ -1,10 +1,11 @@
-import math
-import pickle
 import gzip
+import math
 import os.path as op
+import pickle
 
 from rdkit import Chem
 from rdkit.Chem import rdFingerprintGenerator, rdMolDescriptors
+
 from utils.utils import get_project_path, pjoin
 
 # Globals
