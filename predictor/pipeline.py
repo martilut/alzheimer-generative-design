@@ -66,7 +66,8 @@ def run_pipeline(
         scoring=scoring,
         return_train_score=False,
         return_estimator=True,
-        n_jobs=-1
+        n_jobs=-1,
+        verbose=1  # prints progress info
     )
 
     # Use fitted estimators to generate predictions faster
