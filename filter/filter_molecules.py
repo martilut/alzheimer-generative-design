@@ -5,76 +5,80 @@ from rdkit.Chem.FilterCatalog import FilterCatalog, FilterCatalogParams
 from filter.sascorer import calculateScore
 
 
-def filter_molecules(df: pd.DataFrame):
-    ### Рассчет параметров
 
-    # Считаем QED
-    def QED_definer(smiles):
-        mol = Chem.MolFromSmiles(smiles)
-        qed_value = QED.qed(mol)
-        return qed_value
+### Рассчет параметров
 
-    # Считаем SA_SCORER
-    def sa_scorer_definer(mol):
-        return calculateScore(mol)
+# Считаем QED
+def QED_definer(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    qed_value = QED.qed(mol)
+    return qed_value
 
-    # Фиксируем нарушения правил Липинского
-    def lipinski_definer(mol):
-        mw = Descriptors.MolWt(mol)
-        logp = Descriptors.MolLogP(mol)
-        h_donors = Descriptors.NumHDonors(mol)
-        h_acceptors = Descriptors.NumHAcceptors(mol)
+# Считаем SA_SCORER
+def sa_scorer_definer(mol):
+    return calculateScore(mol)
 
-        violations = 0
-        if mw > 500:
-            violations += 1
-        if logp > 5:
-            violations += 1
-        if h_donors > 5:
-            violations += 1
-        if h_acceptors > 10:
-            violations += 1
+# Фиксируем нарушения правил Липинского
+def lipinski_definer(mol):
+    mw = Descriptors.MolWt(mol)
+    logp = Descriptors.MolLogP(mol)
+    h_donors = Descriptors.NumHDonors(mol)
+    h_acceptors = Descriptors.NumHAcceptors(mol)
 
-        return violations
+    violations = 0
+    if mw > 500:
+        violations += 1
+    if logp > 5:
+        violations += 1
+    if h_donors > 5:
+        violations += 1
+    if h_acceptors > 10:
+        violations += 1
 
-    # Ищем токсикофоры и рассчитываем BBB
-    def compute_properties(mol):
+    return violations
 
-        if not mol:
-            return {"tox_free": False, "bbb": False}
+# Ищем токсикофоры и рассчитываем BBB
+def compute_properties(mol):
 
-        # --- Токсикофоры ---
-        params = FilterCatalogParams()
-        params.AddCatalog(FilterCatalogParams.FilterCatalogs.BRENK)
-        params.AddCatalog(FilterCatalogParams.FilterCatalogs.NIH)
-        catalog = FilterCatalog(params)
-        toxicophore_free = not catalog.HasMatch(mol)
+    if not mol:
+        return {"tox_free": False, "bbb": False}
 
-        # --- BBB критерии ---
-        mol_weight = Descriptors.MolWt(mol)
-        logp = Descriptors.MolLogP(mol)
-        bbb_pass = (400 <= mol_weight <= 500) and (logp > 1)
+    # --- Токсикофоры ---
+    params = FilterCatalogParams()
+    params.AddCatalog(FilterCatalogParams.FilterCatalogs.BRENK)
+    params.AddCatalog(FilterCatalogParams.FilterCatalogs.NIH)
+    catalog = FilterCatalog(params)
+    toxicophore_free = not catalog.HasMatch(mol)
 
-        return {"tox_free": toxicophore_free, "bbb": bbb_pass}
+    # --- BBB критерии ---
+    mol_weight = Descriptors.MolWt(mol)
+    logp = Descriptors.MolLogP(mol)
+    bbb_pass = (400 <= mol_weight <= 500) and (logp > 1)
 
-    # Проверка на канцерогенность
-    def carcinogenicity_check(mol):
-        if not mol:
-            return False
+    return {"tox_free": toxicophore_free, "bbb": bbb_pass}
 
-        # Определяем SMARTS-паттерны канцерогенных групп
-        smarts_patterns = [
-            "[NX3][C](=[O])[NX3]",  # нитрозамины
-            "c1ccc(N)cc1",  # ароматические амины
-            "[NX3]=[NX3]",  # азо-соединения
-            "[O;D2]-[N+](=O)[O-]",  # нитрогруппы
-        ]
-
-        for smarts in smarts_patterns:
-            patt = Chem.MolFromSmarts(smarts)
-            if patt and mol.HasSubstructMatch(patt):
-                return True
+# Проверка на канцерогенность
+def carcinogenicity_check(mol):
+    if not mol:
         return False
+
+    # Определяем SMARTS-паттерны канцерогенных групп
+    smarts_patterns = [
+        "[NX3][C](=[O])[NX3]",  # нитрозамины
+        "c1ccc(N)cc1",  # ароматические амины
+        "[NX3]=[NX3]",  # азо-соединения
+        "[O;D2]-[N+](=O)[O-]",  # нитрогруппы
+    ]
+
+    for smarts in smarts_patterns:
+        patt = Chem.MolFromSmarts(smarts)
+        if patt and mol.HasSubstructMatch(patt):
+            return True
+    return False
+    
+    
+def filter_molecules(df: pd.DataFrame):
+
 
     # --- Apply computations ---
 
