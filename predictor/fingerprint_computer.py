@@ -20,6 +20,8 @@ def get_fp(mol, fp_generator):
 
 def get_fp_dataset(target_id, fp_name, fp_generator) -> pd.DataFrame:
     path = pjoin(get_data_folder(), f"{target_id}_{fp_name}_fp.csv")
+    if os.path.exists(path):
+        return pd.read_csv(path, index_col=0)
     df = pd.read_csv(pjoin(get_data_folder(), f"{target_id}_clean.csv"), index_col=0)
     dataset = []
 

@@ -1,3 +1,4 @@
+import os.path
 import traceback
 
 import pandas as pd
@@ -39,6 +40,8 @@ DESC_FUNCS = {
 
 def get_desc_dataset(target_id, desc_func_name) -> pd.DataFrame:
     path = pjoin(get_data_folder(), f"{target_id}_{desc_func_name}_desc.csv")
+    if os.path.exists(path):
+        return pd.read_csv(path, index_col=0)
     df = pd.read_csv(pjoin(get_data_folder(), f"{target_id}_clean.csv"), index_col=0)
     dataset = []
     for molecule_id in df.index:
