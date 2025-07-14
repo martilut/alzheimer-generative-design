@@ -1,0 +1,14 @@
+[project]
+name = "agd"
+description = "Alzheimer's treatment Generative Design package"
+authors = [
+    {name = "Kropacheva Alena", email = "al.kropach@gmail.com"},
+]
+readme = "README.md"
+requires-python = ">= 3.10, < 4.0"
+
+# Development configurations
+
+# isort
+[tool.isort]
+profile = "black"
