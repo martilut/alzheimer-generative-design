@@ -112,18 +112,9 @@ def run_pipeline(
     check_cols = ['preprocessing_params', 'model_class', 'model_params']
     if os.path.isfile(results_path):
         df_existing = pd.read_csv(results_path)
-        if 'preprocessing_params' not in list(new_row_df.columns):
-            check_cols = check_cols[1:]
-        is_duplicate = (
-            (df_existing[check_cols] == new_row_df[check_cols].iloc[0]).all(axis=1)
-        ).any()
-
-        if is_duplicate:
-            print("Duplicate experiment (same preprocessing + model config). Skipping.")
-        else:
-            df_all = pd.concat([df_existing, new_row_df], ignore_index=True)
-            df_all.to_csv(results_path, index=False)
-            print(f"Appended new experiment to {results_path}")
+        df_all = pd.concat([df_existing, new_row_df], ignore_index=True)
+        df_all.to_csv(results_path, index=False)
+        print(f"Appended new experiment to {results_path}")
     else:
         new_row_df.to_csv(results_path, index=False)
         print(f"Created new results file at {results_path}")
