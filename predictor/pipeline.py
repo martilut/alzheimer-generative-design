@@ -50,6 +50,7 @@ def run_pipeline(
     if isinstance(y, pd.DataFrame):
         y = y.squeeze()
 
+    # Construct pipeline
     preprocessing = get_preprocessing_pipeline(
         selector=selector,
         scaler=scaler,
@@ -57,51 +58,58 @@ def run_pipeline(
     )
     pipeline = get_model_pipeline(preprocessing, model)
 
+    # Single pass cross-validation: get scores and fitted estimators
     scores = cross_validate(
-        pipeline, X, y,
+        pipeline,
+        X, y,
         cv=cv,
         scoring=scoring,
         return_train_score=False,
-        return_estimator=False,
+        return_estimator=True,
+        n_jobs=-1
     )
 
-    # Print scores
+    # Use fitted estimators to generate predictions faster
+    y_pred = np.zeros_like(y, dtype=float)
+    for train_idx, test_idx, est in zip(cv.split(X, y), scores['estimator']):
+        _, test_indices = train_idx[0], train_idx[1]
+        X_test = X.iloc[test_idx]
+        y_pred[test_idx] = est.predict(X_test)
+
+    # Plot predictions once
+    plot_predictions(y, y_pred)
+
+    # Print cross-validation scores
     print("Cross-validation mean scores:")
     for metric in scoring:
         mean_score = np.mean(scores[f'test_{metric}'])
         std_score = np.std(scores[f'test_{metric}'])
         print(f"  {metric}, mean: {mean_score:.4f}, std: {std_score:.4f}")
 
-    # Predictions
-    y_pred = cross_val_predict(pipeline, X, y, cv=cv)
-    plot_predictions(y, y_pred)
-
-    # Score dictionary
-    score_data = {}
+    # Compile score data
+    score_data = {
+        f"{metric}_mean": np.mean(scores[f'test_{metric}'])
+        for metric in scoring
+    }
     for metric in scoring:
-        vals = scores[f'test_{metric}']
-        score_data[f"{metric}_mean"] = np.mean(vals)
-        for i, val in enumerate(vals, start=1):
+        for i, val in enumerate(scores[f'test_{metric}'], start=1):
             score_data[f"{metric}_fold{i}"] = val
 
     # Timing
-    fit_times = scores['fit_time']
-    score_times = scores['score_time']
-    score_data['fit_time_mean'] = np.mean(fit_times)
-    score_data['score_time_mean'] = np.mean(score_times)
-    for i, val in enumerate(fit_times, start=1):
+    score_data['fit_time_mean'] = np.mean(scores['fit_time'])
+    score_data['score_time_mean'] = np.mean(scores['score_time'])
+    for i, val in enumerate(scores['fit_time'], start=1):
         score_data[f"fit_time_fold{i}"] = val
-    for i, val in enumerate(score_times, start=1):
+    for i, val in enumerate(scores['score_time'], start=1):
         score_data[f"score_time_fold{i}"] = val
 
-    # Flatten pipeline
+    # Flatten pipeline info for logging
     pipeline_info = flatten_pipeline_info(pipeline)
     combined_dict = {**pipeline_info, **score_data}
     new_row_df = pd.DataFrame([combined_dict])
 
-    # Append or skip based on duplicate preprocessing + model config
+    # Append if not duplicate
     check_cols = ['preprocessing_params', 'model_class', 'model_params']
-
     if os.path.isfile(results_path):
         df_existing = pd.read_csv(results_path)
         if 'preprocessing_params' not in list(new_row_df.columns):
@@ -120,4 +128,5 @@ def run_pipeline(
         new_row_df.to_csv(results_path, index=False)
         print(f"Created new results file at {results_path}")
 
-    return pipeline
+    # Return last fitted estimator
+    return scores['estimator'][-1]  # or return all estimators if needed
