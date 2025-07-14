@@ -71,8 +71,8 @@ def run_pipeline(
 
     # Use fitted estimators to generate predictions faster
     y_pred = np.zeros_like(y, dtype=float)
-    for train_idx, test_idx, est in zip(cv.split(X, y), scores['estimator']):
-        _, test_indices = train_idx[0], train_idx[1]
+
+    for (train_idx, test_idx), est in zip(cv.split(X, y), scores['estimator']):
         X_test = X.iloc[test_idx]
         y_pred[test_idx] = est.predict(X_test)
 
