@@ -1,13 +1,14 @@
-import requests
-from bs4 import BeautifulSoup
 import csv
-import time
-import urllib.parse
-import pandas as pd
 import json
 import os
+import time
+import urllib.parse
 
-from utils.utils import pjoin, get_data_folder
+import pandas as pd
+import requests
+from bs4 import BeautifulSoup
+
+from utils.utils import get_data_folder, pjoin
 
 # ChEMBL API URL
 CHEMBL_URL = "https://www.ebi.ac.uk/chembl/api/data/"

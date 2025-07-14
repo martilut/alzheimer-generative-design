@@ -5,7 +5,7 @@ import pandas as pd
 from mordred import Calculator, descriptors
 from rdkit.Chem import Descriptors
 
-from utils.utils import get_data_folder, pjoin, get_molecule
+from utils.utils import get_data_folder, get_molecule, pjoin
 
 
 def get_rdkit_descriptors(molecule) -> dict:

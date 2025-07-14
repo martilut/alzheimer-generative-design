@@ -1,10 +1,11 @@
-import math
-import pickle
 import gzip
+import math
 import os.path as op
+import pickle
 
 from rdkit import Chem
 from rdkit.Chem import rdFingerprintGenerator, rdMolDescriptors
+
 from utils.utils import get_project_path, pjoin
 
 # Globals
@@ -15,9 +16,7 @@ mfpgen = rdFingerprintGenerator.GetMorganGenerator(radius=2)
 def readFragmentScores(filename="fpscores.pkl.gz"):
     """Load fragment scores from a gzipped pickle file."""
     global _fscores
-    with gzip.open(
-            pjoin(
-                get_project_path(), "resources", filename), "rb") as f:
+    with gzip.open(pjoin(get_project_path(), "resources", filename), "rb") as f:
         raw_data = pickle.load(f)
 
     scores = {}
@@ -64,7 +63,13 @@ def calculateScore(mol):
     bridge_penalty = math.log10(n_bridge + 1)
     macrocycle_penalty = math.log10(2) if n_macrocycles > 0 else 0.0
 
-    score2 = -(size_penalty + stereo_penalty + spiro_penalty + bridge_penalty + macrocycle_penalty)
+    score2 = -(
+        size_penalty
+        + stereo_penalty
+        + spiro_penalty
+        + bridge_penalty
+        + macrocycle_penalty
+    )
 
     # Symmetry correction (fingerprint density)
     n_bits = len(sfp.GetNonzeroElements())

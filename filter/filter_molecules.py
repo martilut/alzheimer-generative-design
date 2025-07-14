@@ -1,12 +1,12 @@
 import pandas as pd
 from rdkit import Chem
-from rdkit.Chem import QED, Descriptors, AllChem, Lipinski
+from rdkit.Chem import QED, AllChem, Descriptors, Lipinski
 from rdkit.Chem.FilterCatalog import FilterCatalog, FilterCatalogParams
+
 from filter.sascorer import calculateScore
 
-
-
 ### Рассчет параметров
+
 
 # Считаем QED
 def QED_definer(smiles):
@@ -14,9 +14,11 @@ def QED_definer(smiles):
     qed_value = QED.qed(mol)
     return qed_value
 
+
 # Считаем SA_SCORER
 def sa_scorer_definer(mol):
     return calculateScore(mol)
+
 
 # Фиксируем нарушения правил Липинского
 def lipinski_definer(mol):
@@ -36,6 +38,7 @@ def lipinski_definer(mol):
         violations += 1
 
     return violations
+
 
 # Ищем токсикофоры и рассчитываем BBB
 def compute_properties(mol):
@@ -57,6 +60,7 @@ def compute_properties(mol):
 
     return {"tox_free": toxicophore_free, "bbb": bbb_pass}
 
+
 # Проверка на канцерогенность
 def carcinogenicity_check(mol):
     if not mol:
@@ -75,10 +79,9 @@ def carcinogenicity_check(mol):
         if patt and mol.HasSubstructMatch(patt):
             return True
     return False
-    
-    
-def filter_molecules(df: pd.DataFrame):
 
+
+def filter_molecules(df: pd.DataFrame):
 
     # --- Apply computations ---
 
@@ -109,12 +112,12 @@ def filter_molecules(df: pd.DataFrame):
     # --- Filter conditions ---
 
     df_filtered = df_filtered[
-        (df_filtered["qed"] > 0.7) &
-        (df_filtered["sa"].between(2, 6)) &
-        (df_filtered["bbb"]) &
-        (df_filtered["tox_free"]) &
-        (df_filtered["lip"] <= 1) &
-        (df_filtered["carc"])
+        (df_filtered["qed"] > 0.7)
+        & (df_filtered["sa"].between(2, 6))
+        & (df_filtered["bbb"])
+        & (df_filtered["tox_free"])
+        & (df_filtered["lip"] <= 1)
+        & (df_filtered["carc"])
     ]
 
     return df_filtered

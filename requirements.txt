@@ -1,6 +1,19 @@
 beautifulsoup4==4.13.4
-numpy==2.2.6
+black==25.1.0
+catboost==1.2.8
+joblib==1.5.1
+lightgbm==4.6.0
+matplotlib==3.10.3
+mordred @ git+https://github.com/mordred-descriptor/mordred@c9de906f0d7829a9abe80658b19f4f9f9aef6648
+notebook==7.4.4
+numpy==1.26.4
 pandas==2.3.1
 rdkit==2025.3.3
 requests==2.32.4
-git+https://github.com/mordred-descriptor/mordred.git@master
+scikit-learn==1.6.1
+scipy==1.15.3
+seaborn==0.12.2
+tqdm==4.67.1
+xgboost==3.0.2
+isort==6.0.1
+pytest==8.4.1
