@@ -8,7 +8,6 @@ import seaborn as sns
 import json
 
 
-
 def get_project_path() -> str:
     return str(Path(__file__).parent.parent)
 
@@ -19,6 +18,7 @@ def pjoin(*args) -> Path:
 
 def get_data_folder() -> str:
     return pjoin(get_project_path(), "data")
+
 
 def get_molecule(smiles: str):
     try:
@@ -32,10 +32,16 @@ def get_molecule(smiles: str):
 def plot_predictions(y_true, y_pred):
     plt.figure(figsize=(6, 6))
     sns.scatterplot(x=y_true, y=y_pred, alpha=0.6)
-    plt.plot([min(y_true), max(y_true)], [min(y_true), max(y_true)], color='red', linestyle='--', label='Ideal')
-    plt.xlabel('True pIC50')
-    plt.ylabel('Predicted pIC50')
-    plt.title('Predicted vs. True pIC50')
+    plt.plot(
+        [min(y_true), max(y_true)],
+        [min(y_true), max(y_true)],
+        color="red",
+        linestyle="--",
+        label="Ideal",
+    )
+    plt.xlabel("True pIC50")
+    plt.ylabel("Predicted pIC50")
+    plt.title("Predicted vs. True pIC50")
     plt.legend()
     plt.grid(True)
     plt.tight_layout()

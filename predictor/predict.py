@@ -14,7 +14,9 @@ def predict(smiles: str, model_name: str, desc_func_name: str) -> float:
     descriptors = DESC_FUNCS[desc_func_name](mol)
 
     X = pd.DataFrame(descriptors, index=[smiles])
-    pipeline_features = list(pipeline.named_steps['preprocessing'].get_feature_names_out())
+    pipeline_features = list(
+        pipeline.named_steps["preprocessing"].get_feature_names_out()
+    )
     X = X.loc[:, pipeline_features]
 
     return pipeline.predict(X)[0]

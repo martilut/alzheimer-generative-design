@@ -18,6 +18,7 @@ def get_fp(mol, fp_generator):
         fp = None
     return fp
 
+
 def get_fp_dataset(target_id, fp_name, fp_generator) -> pd.DataFrame:
     path = pjoin(get_data_folder(), f"{target_id}_{fp_name}_fp.csv")
     if os.path.exists(path):
@@ -44,9 +45,7 @@ def get_fp_dataset(target_id, fp_name, fp_generator) -> pd.DataFrame:
             continue
         fp_array = np.zeros((1,))
         DataStructs.ConvertToNumpyArray(fp, fp_array)
-        res.update(
-            {f"{i}": v for i, v in enumerate(fp_array)}
-        )
+        res.update({f"{i}": v for i, v in enumerate(fp_array)})
         dataset.append(res)
     dataset = pd.DataFrame(dataset)
     dataset.set_index("molecule_chembl_id", drop=True, inplace=True)
@@ -57,7 +56,7 @@ def get_fp_dataset(target_id, fp_name, fp_generator) -> pd.DataFrame:
 if __name__ == "__main__":
     target_id = "CHEMBL2760"
     fp_name = "morgan"
-    fp_generator = rdFingerprintGenerator.GetMorganGenerator(radius=2,fpSize=2048)
+    fp_generator = rdFingerprintGenerator.GetMorganGenerator(radius=2, fpSize=2048)
 
     # Generate the fingerprint dataset
     fp_dataset = get_fp_dataset(target_id, fp_name, fp_generator)
