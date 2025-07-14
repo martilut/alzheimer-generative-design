@@ -51,5 +51,5 @@ def flatten_pipeline_info(pipeline):
             for k, v in params.items()
         )
         flat_info[f"{name}_class"] = step.__class__.__name__
-        flat_info[f"{name}_params"] = param_str
+        flat_info[f"{name}_params"] = param_str if param_str else "No parameters"
     return flat_info

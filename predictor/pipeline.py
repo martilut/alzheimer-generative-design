@@ -104,7 +104,8 @@ def run_pipeline(
 
     if os.path.isfile(results_path):
         df_existing = pd.read_csv(results_path)
-
+        if 'preprocessing_params' not in list(new_row_df.columns):
+            check_cols = check_cols[1:]
         is_duplicate = (
             (df_existing[check_cols] == new_row_df[check_cols].iloc[0]).all(axis=1)
         ).any()
