@@ -24,10 +24,10 @@ def get_mordred_descriptors(molecule) -> dict:
     res = {}
     for desc, value in calc(molecule).items():
         try:
-            res[desc] = value
+            res[str(desc)] = value
         except Exception as e:
             traceback.print_exc()
-            res[desc] = None
+            res[str(desc)] = None
     return res
 
 
