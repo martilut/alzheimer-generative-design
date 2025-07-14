@@ -16,3 +16,4 @@ seaborn==0.12.2
 tqdm==4.67.1
 xgboost==3.0.2
 isort==6.0.1
+pytest==8.4.1

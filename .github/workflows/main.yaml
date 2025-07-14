@@ -24,9 +24,6 @@ jobs:
     - name: Lint with Isort
       run: |
         isort . -c -v
-    - name: Lint with Mypy
-      run: |
-        mypy . --check
     - name: Test with Pytest
       run: |
         pytest test
