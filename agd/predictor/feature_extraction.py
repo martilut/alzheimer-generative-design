@@ -8,7 +8,7 @@ from mordred import descriptors as mordred_descriptors
 from rdkit import DataStructs
 from rdkit.Chem import Descriptors, rdFingerprintGenerator
 
-from utils.utils import get_data_folder, get_molecule, pjoin
+from agd.utils.utils import get_data_folder, get_molecule, pjoin
 
 
 def get_fingerprint_array(mol, fp_generator) -> np.ndarray:

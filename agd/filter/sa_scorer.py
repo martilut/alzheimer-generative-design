@@ -6,7 +6,7 @@ from typing import List, Optional, Tuple
 from rdkit import Chem
 from rdkit.Chem import rdFingerprintGenerator, rdMolDescriptors
 
-from utils.utils import get_project_path, pjoin
+from agd.utils.utils import get_project_path, pjoin
 
 
 class SyntheticAccessibilityScorer:

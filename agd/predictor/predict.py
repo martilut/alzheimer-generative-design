@@ -1,9 +1,7 @@
 import joblib
-import pandas as pd
-from rdkit import Chem
 
-from agd.predictor.feature_extraction import DESC_FUNCS, smiles_to_features
-from utils.utils import get_project_path, pjoin
+from agd.predictor.feature_extraction import smiles_to_features
+from agd.utils.utils import get_project_path, pjoin
 
 
 def predict(

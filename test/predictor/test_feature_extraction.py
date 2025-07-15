@@ -1,13 +1,12 @@
 import os
 
 import pandas as pd
-import pytest
 
 from agd.predictor.feature_extraction import (
     get_features_dataset,
     smiles_to_features,
 )
-from utils.utils import get_project_path, pjoin
+from agd.utils.utils import get_project_path, pjoin
 
 # Constants
 DATA_DIR = pjoin(get_project_path(), "test", "resources")

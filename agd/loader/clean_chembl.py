@@ -3,7 +3,7 @@ from typing import List, Optional
 
 import pandas as pd
 
-from utils.utils import get_data_folder, pjoin
+from agd.utils.utils import get_data_folder, pjoin
 
 FILTER_COLUMNS = [
     "action_type",

@@ -5,7 +5,7 @@ import time
 import pandas as pd
 import requests
 
-from utils.utils import get_data_folder, pjoin
+from agd.utils.utils import get_data_folder, pjoin
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
