@@ -2,7 +2,7 @@ import joblib
 import pandas as pd
 from rdkit import Chem
 
-from agd.predictor.feature_extraction import smiles_to_features, DESC_FUNCS
+from agd.predictor.feature_extraction import DESC_FUNCS, smiles_to_features
 from utils.utils import get_project_path, pjoin
 
 
@@ -35,7 +35,9 @@ def predict(
     load_path = pjoin(get_project_path(), "resources", f"{model_name}.pkl")
     pipeline = joblib.load(load_path)
 
-    features_df = smiles_to_features(smiles, descriptors=descriptors, fingerprints=fingerprints)
+    features_df = smiles_to_features(
+        smiles, descriptors=descriptors, fingerprints=fingerprints
+    )
 
     # Align with training features
     try:
@@ -48,10 +50,7 @@ def predict(
 
 
 def predict_rdkit_morgan(
-    smiles: str,
-    model_name: str,
-    fpSize: int = 1024,
-    radius: int = 2
+    smiles: str, model_name: str, fpSize: int = 1024, radius: int = 2
 ) -> float:
     """
     Convenience wrapper for RDKit + Morgan fingerprint model prediction.
@@ -63,9 +62,5 @@ def predict_rdkit_morgan(
         smiles=smiles,
         model_name=full_model_name,
         descriptors=["rdkit"],
-        fingerprints={
-            "morgan": {
-                "params": {"radius": radius, "fpSize": fpSize}
-            }
-        }
+        fingerprints={"morgan": {"params": {"radius": radius, "fpSize": fpSize}}},
     )

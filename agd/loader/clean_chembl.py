@@ -1,27 +1,44 @@
-import pandas as pd
 from pathlib import Path
-from typing import Optional, List
+from typing import List, Optional
+
+import pandas as pd
 
 from utils.utils import get_data_folder, pjoin
 
-
 FILTER_COLUMNS = [
-    "action_type", "activity_comment", "assay_type", "bao_label",
-    "canonical_smiles", "data_validity_comment", "pchembl_value",
-    "potential_duplicate", "standard_flag", "standard_relation",
-    "standard_units", "standard_value", "type", "upper_value",
-    "value", "molecule_chembl_id"
+    "action_type",
+    "activity_comment",
+    "assay_type",
+    "bao_label",
+    "canonical_smiles",
+    "data_validity_comment",
+    "pchembl_value",
+    "potential_duplicate",
+    "standard_flag",
+    "standard_relation",
+    "standard_units",
+    "standard_value",
+    "type",
+    "upper_value",
+    "value",
+    "molecule_chembl_id",
 ]
 
 NUMERIC_COLUMNS = [
-    "pchembl_value", "potential_duplicate", "standard_flag",
-    "standard_value", "upper_value", "value"
+    "pchembl_value",
+    "potential_duplicate",
+    "standard_flag",
+    "standard_value",
+    "upper_value",
+    "value",
 ]
 
 
 def filter_data(df: pd.DataFrame) -> pd.DataFrame:
     df = df[FILTER_COLUMNS].dropna(subset=["standard_value"]).drop_duplicates()
-    df[NUMERIC_COLUMNS] = df[NUMERIC_COLUMNS].apply(pd.to_numeric, errors='coerce').astype(float)
+    df[NUMERIC_COLUMNS] = (
+        df[NUMERIC_COLUMNS].apply(pd.to_numeric, errors="coerce").astype(float)
+    )
     return df.where(pd.notna(df), None)
 
 
@@ -38,9 +55,9 @@ def safe_dropna(df: pd.DataFrame, subset: List[str]) -> pd.DataFrame:
 def handle_duplicates(df: pd.DataFrame, molecule_id: str) -> Optional[pd.DataFrame]:
     df = df[df["molecule_chembl_id"] == molecule_id]
     df = df[
-        (df["type"] == "IC50") &
-        (df["standard_units"] == "nM") &
-        df["canonical_smiles"].notna()
+        (df["type"] == "IC50")
+        & (df["standard_units"] == "nM")
+        & df["canonical_smiles"].notna()
     ]
 
     if df.empty:

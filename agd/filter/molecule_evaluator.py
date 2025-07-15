@@ -20,7 +20,7 @@ class MoleculeEvaluator:
         lipinski_h_donors_max: int = 5,
         lipinski_h_acceptors_max: int = 10,
         lipinski_max_violations: int = 1,
-        sa_scorer: SyntheticAccessibilityScorer | None = None
+        sa_scorer: SyntheticAccessibilityScorer | None = None,
     ):
         self.qed_threshold = qed_threshold
         self.sa_score_range = sa_score_range
@@ -31,12 +31,14 @@ class MoleculeEvaluator:
         self.lipinski_h_donors_max = lipinski_h_donors_max
         self.lipinski_h_acceptors_max = lipinski_h_acceptors_max
         self.lipinski_max_violations = lipinski_max_violations
-        self.sa_scorer = SyntheticAccessibilityScorer() if sa_scorer is None else sa_scorer
+        self.sa_scorer = (
+            SyntheticAccessibilityScorer() if sa_scorer is None else sa_scorer
+        )
         self.carcinogenic_patterns = [
             "[NX3][C](=[O])[NX3]",  # Nitrosamines
             "c1ccc(N)cc1",  # Aromatic amines
             "[NX3]=[NX3]",  # Azo compounds
-            "[O;D2]-[N+](=O)[O-]"  # Nitro groups
+            "[O;D2]-[N+](=O)[O-]",  # Nitro groups
         ]
 
     def compute_sa_score(self, mol) -> float:
@@ -74,10 +76,11 @@ class MoleculeEvaluator:
         # BBB check
         mw = Descriptors.MolWt(mol)
         logp = Descriptors.MolLogP(mol)
-        bbb = (self.bbb_mw_range[0] <= mw <= self.bbb_mw_range[1]) and (logp > self.bbb_logp_min)
+        bbb = (self.bbb_mw_range[0] <= mw <= self.bbb_mw_range[1]) and (
+            logp > self.bbb_logp_min
+        )
 
         return {"tox_free": tox_free, "bbb": bbb}
-
 
     def is_carcinogenic(self, mol) -> bool:
         if not mol:
@@ -124,10 +127,10 @@ def filter_molecules(df: pd.DataFrame, evaluator: MoleculeEvaluator) -> pd.DataF
     result_df = pd.DataFrame(filtered_data)
 
     return result_df[
-        (result_df["qed"] > evaluator.qed_threshold) &
-        (result_df["sa"].between(*evaluator.sa_score_range)) &
-        (result_df["bbb"]) &
-        (result_df["tox_free"]) &
-        (result_df["lip"] <= evaluator.lipinski_max_violations) &
-        (result_df["carc"])
+        (result_df["qed"] > evaluator.qed_threshold)
+        & (result_df["sa"].between(*evaluator.sa_score_range))
+        & (result_df["bbb"])
+        & (result_df["tox_free"])
+        & (result_df["lip"] <= evaluator.lipinski_max_violations)
+        & (result_df["carc"])
     ]

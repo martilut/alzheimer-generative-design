@@ -21,11 +21,7 @@ def get_existing_data(filepath: str) -> pd.DataFrame:
 
 
 def fetch_activities_from_api(
-    target_id: str,
-    base_url: str,
-    request_limit: int,
-    global_limit: int,
-    delay: float
+    target_id: str, base_url: str, request_limit: int, global_limit: int, delay: float
 ) -> list:
     """Fetch activity records from ChEMBL API."""
     all_activities = []
@@ -37,7 +33,7 @@ def fetch_activities_from_api(
             "standard_type": "IC50",
             "limit": request_limit,
             "offset": offset,
-            "format": "json"
+            "format": "json",
         }
 
         response = requests.get(base_url, params=params)
@@ -50,7 +46,9 @@ def fetch_activities_from_api(
             break
 
         all_activities.extend(activities)
-        logger.info(f"Fetched {len(activities)} new activities (Total: {len(all_activities)})")
+        logger.info(
+            f"Fetched {len(activities)} new activities (Total: {len(all_activities)})"
+        )
         offset += request_limit
 
     return all_activities
@@ -72,7 +70,7 @@ def parse_activities(
     request_limit: int = 1000,
     global_limit: int = 10000,
     delay: float = 0.05,
-    cache_dir: str = None
+    cache_dir: str = None,
 ) -> pd.DataFrame:
     """Main function to fetch and optionally cache ChEMBL activity data."""
     cache_dir = cache_dir or get_data_folder()

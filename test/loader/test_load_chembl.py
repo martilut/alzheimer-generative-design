@@ -5,7 +5,11 @@ from unittest import mock
 import pandas as pd
 import pytest
 
-from agd.loader.load_chembl import get_existing_data, activities_to_dataframe, fetch_activities_from_api
+from agd.loader.load_chembl import (
+    activities_to_dataframe,
+    fetch_activities_from_api,
+    get_existing_data,
+)
 
 
 @pytest.fixture
@@ -64,8 +68,7 @@ def test_fetch_activities_from_api(mock_get, dummy_activity_data):
         base_url="https://mock.api",
         request_limit=100,
         global_limit=200,
-        delay=0.01
+        delay=0.01,
     )
 
     assert len(results) == len(dummy_activity_data)
-

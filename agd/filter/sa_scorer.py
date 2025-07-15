@@ -1,7 +1,7 @@
 import gzip
 import math
 import pickle
-from typing import Optional, List, Tuple
+from typing import List, Optional, Tuple
 
 from rdkit import Chem
 from rdkit.Chem import rdFingerprintGenerator, rdMolDescriptors
@@ -30,7 +30,9 @@ class SyntheticAccessibilityScorer:
 
         score_file = pjoin(get_project_path(), "resources", score_file_name)
         self.fragment_scores = self._load_fragment_scores(score_file)
-        self.fingerprint_generator = rdFingerprintGenerator.GetMorganGenerator(radius=morgan_radius)
+        self.fingerprint_generator = rdFingerprintGenerator.GetMorganGenerator(
+            radius=morgan_radius
+        )
 
     def _load_fragment_scores(self, filename: str) -> dict:
         """Load precomputed fragment scores from compressed pickle file."""
@@ -75,18 +77,18 @@ class SyntheticAccessibilityScorer:
         n_bridge, n_spiro = self.count_bridgeheads_and_spiro(mol)
         n_macrocycles = sum(1 for ring in ring_info.AtomRings() if len(ring) > 8)
 
-        size_penalty = n_atoms ** 1.005 - n_atoms
+        size_penalty = n_atoms**1.005 - n_atoms
         stereo_penalty = math.log10(n_chiral + 1)
         spiro_penalty = math.log10(n_spiro + 1)
         bridge_penalty = math.log10(n_bridge + 1)
         macrocycle_penalty = math.log10(2) if n_macrocycles > 0 else 0.0
 
         score2 = -(
-            size_penalty +
-            stereo_penalty +
-            spiro_penalty +
-            bridge_penalty +
-            macrocycle_penalty
+            size_penalty
+            + stereo_penalty
+            + spiro_penalty
+            + bridge_penalty
+            + macrocycle_penalty
         )
 
         # --- Symmetry correction ---
@@ -100,7 +102,8 @@ class SyntheticAccessibilityScorer:
 
         sascore = (
             11.0
-            - ((raw_sascore - self.score_min + 1) / (self.score_max - self.score_min)) * 9.0
+            - ((raw_sascore - self.score_min + 1) / (self.score_max - self.score_min))
+            * 9.0
         )
 
         # Smooth top end
@@ -109,7 +112,9 @@ class SyntheticAccessibilityScorer:
 
         return max(self.score_lower_bound, min(self.score_upper_bound, sascore))
 
-    def batch_score(self, mols: List[Chem.Mol]) -> List[Tuple[str, str, Optional[float]]]:
+    def batch_score(
+        self, mols: List[Chem.Mol]
+    ) -> List[Tuple[str, str, Optional[float]]]:
         """Compute SA scores for a list of molecules and return results."""
         results = []
         for mol in mols:

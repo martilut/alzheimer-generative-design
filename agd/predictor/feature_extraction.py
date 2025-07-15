@@ -1,9 +1,10 @@
 import os
 import traceback
+
 import numpy as np
 import pandas as pd
-
-from mordred import Calculator, descriptors as mordred_descriptors
+from mordred import Calculator
+from mordred import descriptors as mordred_descriptors
 from rdkit import DataStructs
 from rdkit.Chem import Descriptors, rdFingerprintGenerator
 
@@ -102,7 +103,9 @@ def smiles_to_features(
             try:
                 fp_gen = fp_gen_class(**fp_info["params"])
             except Exception as e:
-                raise RuntimeError(f"Failed to initialize fingerprint generator '{fp_name}': {e}")
+                raise RuntimeError(
+                    f"Failed to initialize fingerprint generator '{fp_name}': {e}"
+                )
 
             fp_records = []
             for smiles in smiles_list:
@@ -118,7 +121,9 @@ def smiles_to_features(
             all_feature_dfs.append(pd.DataFrame(fp_records))
 
     if not all_feature_dfs:
-        raise ValueError("No features computed. Provide at least descriptors or fingerprints.")
+        raise ValueError(
+            "No features computed. Provide at least descriptors or fingerprints."
+        )
 
     combined_df = pd.concat(all_feature_dfs, axis=1)
     combined_df.reset_index(drop=True, inplace=True)
@@ -144,7 +149,9 @@ def get_features_dataset(
     feature_suffix = "_".join(feature_suffix_parts)
     if data_dir is None:
         path = pjoin(get_data_folder(), f"{target_id}_{feature_suffix}.csv")
-        df = pd.read_csv(pjoin(get_data_folder(), f"{target_id}_clean.csv"), index_col=0)
+        df = pd.read_csv(
+            pjoin(get_data_folder(), f"{target_id}_clean.csv"), index_col=0
+        )
     else:
         path = pjoin(data_dir, f"{target_id}_{feature_suffix}.csv")
         df = pd.read_csv(pjoin(data_dir, f"{target_id}_clean.csv"), index_col=0)
