@@ -122,4 +122,4 @@ def run_pipeline(
         print(f"Created new results file at {results_path}")
 
     # Return last fitted estimator
-    return scores["estimator"][-1]  # or return all estimators if needed
+    return scores["estimator"][-1], pipeline  # or return all estimators if needed

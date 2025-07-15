@@ -10,12 +10,12 @@ from rdkit.Chem import Descriptors, rdFingerprintGenerator
 from utils.utils import get_data_folder, get_molecule, get_project_path, pjoin
 
 
-def get_fp(mol, fp_generator):
-    try:
-        fp = fp_generator.GetFingerprint(mol)
-    except Exception as e:
-        fp = None
-    return fp
+def get_fp(mol, fp_generator) -> np.array:
+    fp = fp_generator.GetFingerprint(mol)
+    fp_array = np.zeros((1,))
+    DataStructs.ConvertToNumpyArray(fp, fp_array)
+
+    return fp_array
 
 
 def get_fp_dataset(target_id, fp_name, fp_generator) -> pd.DataFrame:
@@ -37,13 +37,10 @@ def get_fp_dataset(target_id, fp_name, fp_generator) -> pd.DataFrame:
         if mol is None:
             print(f"Invalid SMILES for {molecule_id}: {molecule_smiles}")
             continue
-
-        fp = get_fp(mol, fp_generator)
-        if fp is None:
-            print(f"Failed to compute fingerprint for {molecule_id}: {molecule_smiles}")
+        fp_array = get_fp(mol, fp_generator)
+        if fp_array is None:
+            print(f"Invalid fingerprint for {molecule_id}: {molecule_smiles}")
             continue
-        fp_array = np.zeros((1,))
-        DataStructs.ConvertToNumpyArray(fp, fp_array)
         res.update({f"{i}": v for i, v in enumerate(fp_array)})
         dataset.append(res)
     dataset = pd.DataFrame(dataset)
