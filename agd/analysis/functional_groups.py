@@ -2,6 +2,7 @@ import pandas as pd
 from rdkit import Chem
 from rdkit.Chem import rdMolDescriptors
 
+
 def count_functional_groups(file_path):
     """
     Counts various functional groups and features in molecules from a CSV file.
@@ -40,18 +41,18 @@ def count_functional_groups(file_path):
 
     # SMARTS patterns for searching functional groups
     smarts_patterns = {
-        "amines_primary": "[NX3;H2]",                 # primary amine
-        "amines_secondary": "[NX3;H1]",               # secondary amine
-        "amines_tertiary": "[NX3;H0;!$(NC=O)]",       # tertiary amine (not an amide)
+        "amines_primary": "[NX3;H2]",  # primary amine
+        "amines_secondary": "[NX3;H1]",  # secondary amine
+        "amines_tertiary": "[NX3;H0;!$(NC=O)]",  # tertiary amine (not an amide)
         "amides": "NC=O",
         "carboxylic_acids": "C(=O)[OH]",
         "esters": "C(=O)O[C;!H0]",
         "nitriles": "C#N",
         "nitro_groups": "[$([NX3](=O)=O)]",
         "sulfonamides": "S(=O)(=O)N",
-        "hydroxyl_groups": "[OX2H]",                  # alcohol OH groups
-        "phenols": "c[OH]",                           # phenols
-        "thiols": "[SX2H]",                           # SH groups
+        "hydroxyl_groups": "[OX2H]",  # alcohol OH groups
+        "phenols": "c[OH]",  # phenols
+        "thiols": "[SX2H]",  # SH groups
         "alkynes": "C#C",
     }
 
