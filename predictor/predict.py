@@ -4,15 +4,11 @@ from rdkit import Chem
 from rdkit.Chem import rdFingerprintGenerator
 
 from predictor.descriptor_computer import DESC_FUNCS, get_rdkit_descriptors
-from predictor.fingerprint_computer import get_fp_dataset, get_fp
+from predictor.fingerprint_computer import get_fp, get_fp_dataset
 from utils.utils import get_project_path, pjoin
 
 
-def predict(
-        smiles: str,
-        model_name: str,
-        desc_func_names: list[str]
-) -> float:
+def predict(smiles: str, model_name: str, desc_func_names: list[str]) -> float:
     load_path = pjoin(get_project_path(), "resources", f"{model_name}.pkl")
     pipeline = joblib.load(load_path)
 
@@ -35,7 +31,9 @@ def predict(
     return pipeline.predict(x)[0]
 
 
-def predict_rdkit_morgan(smiles: str, model_name: str, bit: int = 1024, radius: int = 3) -> float:
+def predict_rdkit_morgan(
+    smiles: str, model_name: str, bit: int = 1024, radius: int = 3
+) -> float:
     load_path = pjoin(get_project_path(), "resources", f"{model_name}_rdkit_morgan.pkl")
     pipeline = joblib.load(load_path)
 
@@ -46,9 +44,7 @@ def predict_rdkit_morgan(smiles: str, model_name: str, bit: int = 1024, radius: 
     morgan_fp = pd.DataFrame(fp.reshape((1, bit)), index=[smiles])
     descriptors = pd.concat([rdkit_desc, morgan_fp], axis=1)
 
-    pipeline_features = list(
-        pipeline.named_steps["model"].feature_names_
-    )
+    pipeline_features = list(pipeline.named_steps["model"].feature_names_)
     x = descriptors.copy()
     x.columns = [str(i) for i in x.columns]
     x = x.loc[:, pipeline_features]
@@ -57,7 +53,9 @@ def predict_rdkit_morgan(smiles: str, model_name: str, bit: int = 1024, radius: 
 
 
 if __name__ == "__main__":
-    print(predict_rdkit_morgan(
-    smiles="CN[C@@H]1C[C@H]2O[C@@](C)([C@@H]1OC)n1c3ccccc3c3c4c(c5c6ccccc6n2c5c31)C(=O)NC4",
-    model_name="catboost",
-))
+    print(
+        predict_rdkit_morgan(
+            smiles="CN[C@@H]1C[C@H]2O[C@@](C)([C@@H]1OC)n1c3ccccc3c3c4c(c5c6ccccc6n2c5c31)C(=O)NC4",
+            model_name="catboost",
+        )
+    )
